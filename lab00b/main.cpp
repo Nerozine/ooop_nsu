@@ -80,7 +80,7 @@ void writeTable(const std::list <std::pair <std::string, int>>& myList, std::ofs
         << "frequency(in%)" << endl;
 
     for (auto& it : myList) {
-        double freqInPercent = static_cast<double>(it.second) / totalWords;
+        double freqInPercent = static_cast<double>(it.second) / static_cast<double>(totalWords);
         out << it.first << ","
             << it.second << ","
             << round(freqInPercent * 100) << endl;
