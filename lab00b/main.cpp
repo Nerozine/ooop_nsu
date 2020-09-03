@@ -114,11 +114,7 @@ int main(int argc, char* argv[]) {
     std::map <std::string, int> myMap;
     long long totalWords = 0;
 
-    while (true) {
-        if (in.eof()) {
-            break;
-        }
-
+    while (!in.eof()) {
         std::string line;
         getline(in, line);
         totalWords += splitLine(line, myMap);
