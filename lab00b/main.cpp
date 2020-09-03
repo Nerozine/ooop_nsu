@@ -3,6 +3,7 @@
 #include <fstream>
 #include <list>
 #include <map>
+#include <cmath>
 
 
 bool isSuitableSym(char symbol) {
@@ -15,23 +16,28 @@ int splitLine(const std::string& line, std::map <std::string, int>& myMap)  {
     using namespace std;
 
     int countWordInLine = 0;
-    int countSymbPos = 0;
+    int startPosSubStr = 0;
+    bool isSubStr = false;
     string word;
 
     for (int i = 0; i < line.length(); i++) {
         if (isSuitableSym(line[i])) {
-            word[i] = line[i];
-            countSymbPos++;
+            if (!isSubStr) {
+                startPosSubStr = i;
+            }
+            isSubStr = true;
         }
-        else if (countSymbPos != 0) {
+        else if (isSubStr) {
+            word = line.substr(startPosSubStr, i - startPosSubStr);
             myMap[word]++;
             word.clear();
-            countSymbPos = 0;
+            isSubStr = false;
             countWordInLine++;
         }
     }
 
-    if (countSymbPos != 0) {
+    if (isSubStr) {
+        word = line.substr(startPosSubStr, line.length() - startPosSubStr);
         myMap[word]++;
         countWordInLine++;
     }
@@ -74,14 +80,20 @@ void writeTable(const std::list <std::pair <std::string, int>>& myList, std::ofs
         << "frequency(in%)" << endl;
 
     for (auto& it : myList) {
+        double freqInPercent = static_cast<double>(it.second) / totalWords;
         out << it.first << ","
             << it.second << ","
-            << static_cast<int>(static_cast<double>(it.second) / totalWords) * 100 << endl;
+            << round(freqInPercent * 100) << endl;
     }
 }
 
 
 int main(int argc, char* argv[]) {
+
+    if (argc != 3) {
+        std::cout << "Wrong number of parameters" << std::endl;
+        return 0;
+    }
 
     std::ifstream in;
     in.open(argv[1]);
