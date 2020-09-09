@@ -6,14 +6,15 @@
 #include <cmath>
 
 
+using namespace std;
+
+
 bool isSuitableSym(char symbol) {
     return isalpha(symbol) || isdigit(symbol);
 }
 
 
-int splitLine(const std::string& line, std::map <std::string, int>& myMap)  {
-
-    using namespace std;
+int splitLine(const string& line, map <string, int>& myMap)  {
 
     int countWordInLine = 0;
     int startPosSubStr = 0;
@@ -46,9 +47,7 @@ int splitLine(const std::string& line, std::map <std::string, int>& myMap)  {
 }
 
 
-std::list <std::pair<std::string, int>> createList(std::map<std::string, int>& myMap) {
-
-    using namespace std;
+list <pair<string, int>> createList(map<string, int>& myMap) {
 
     list <pair <string, int>> myList;
 
@@ -71,9 +70,7 @@ std::list <std::pair<std::string, int>> createList(std::map<std::string, int>& m
 }
 
 
-void writeTable(const std::list <std::pair <std::string, int>>& myList, std::ofstream& out, long long totalWords) {
-
-    using namespace std;
+void writeTable(const list <pair <string, int>>& myList, ofstream& out, long long totalWords) {
 
     out << "word" <<  ","
         << "frequency" << ","
@@ -91,38 +88,38 @@ void writeTable(const std::list <std::pair <std::string, int>>& myList, std::ofs
 int main(int argc, char* argv[]) {
 
     if (argc != 3) {
-        std::cout << "Wrong number of parameters" << std::endl;
+        cout << "Wrong number of parameters" << endl;
         return 0;
     }
 
-    std::ifstream in;
+    ifstream in;
     in.open(argv[1]);
     if (!in.is_open()){
         // Error opening input
-        std::cout << "Error while opening input file: " << argv[1] << std::endl;
+        cout << "Error while opening input file: " << argv[1] << endl;
         return 0;
     }
 
-    std::ofstream out;
+    ofstream out;
     out.open(argv[2]);
     if (!out.is_open()) {
         // Error opening output
-        std::cout << "Error while opening output file: " << argv[2] << std::endl;
+        cout << "Error while opening output file: " << argv[2] << endl;
         return 0;
     }
 
-    std::map <std::string, int> myMap;
+    map <string, int> myMap;
     long long totalWords = 0;
 
     while (!in.eof()) {
-        std::string line;
+        string line;
         getline(in, line);
         totalWords += splitLine(line, myMap);
     }
 
     in.close();
 
-    std::list <std::pair<std::string, int>> myList = createList(myMap);
+    list <pair<string, int>> myList = createList(myMap);
     writeTable(myList, out, totalWords);
 
     myList.clear();
