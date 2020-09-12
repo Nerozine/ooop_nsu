@@ -1,14 +1,20 @@
 #include <iostream>
 #include "tritset.h"
+#include <algorithm>
 
+#include <string>
 using namespace std;
 
 int main() {
-    cout << sizeof(u__int) * 8 << endl; // 4 * 8 = 32
-    cout << 32 / 2 << endl; // 16
-    int *test  = new int[10];
-    for (int i = 0; i < 10; i++) {
-        cout << test[i] << " ";
+    tritset test(10,10);
+    test[0] = trit::tritFalse;
+    if (test[3321] == trit::tritFalse) {
+        cout << "It's working!" << endl;
     }
+    else {
+        cout << "It's not working!" << endl;
+    }
+
+
     return 0;
 }
