@@ -1,20 +1,21 @@
 #include <iostream>
 #include "tritset.h"
-#include <algorithm>
 
-#include <string>
+
 using namespace std;
 
+
 int main() {
-    tritset test(10,10);
-    test[0] = trit::tritFalse;
-    if (test[3321] == trit::tritFalse) {
+    tritset set(1000);
+    cout << "current arr length: " << set.capacity() << endl;
+    set[1000000000] = trit::tritTrue;
+    cout << "current arr length: " << set.capacity() << endl;
+    if (set[1000000000] == trit::tritTrue) {
         cout << "It's working!" << endl;
     }
     else {
         cout << "It's not working!" << endl;
     }
-
 
     return 0;
 }
