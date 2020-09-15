@@ -3,30 +3,33 @@
 #include <cstring>
 #include <cstdlib>
 #include <unordered_map>
+#include <iostream>
+
 
 typedef unsigned int u__int;
-enum class trit {tritFalse = 2, tritUnknown = 0, tritTrue = 1};
+enum class trit {tFalse = 2, tUnknown = 0, tTrue = 1};
 
 
-class tritsetSupport;
+class TritsetSupport;
 
-class tritset {
-    friend tritsetSupport;
+class Tritset {
+    friend TritsetSupport;
 private:
     u__int *arr;
-    int arrLength; // Current length in (u__int?)
-    int arrSize; // Array max size in (u__int?)
+    int arrLength; // Current length in u__int
+    int arrSize; // Array max size in u__int
     int lastIndexInTrits; // Last array index in trits
+    void expandArray(Tritset *t, u__int newSizeInUiBytes);
 public:
-    tritset();
-    explicit tritset(int n);
-    ~tritset();
-    tritset operator&(const tritset &secondOperand);
-    tritset operator|(const tritset &secondOperand);
-    tritset operator!();
+    Tritset();
+    explicit Tritset(int n);
+    ~Tritset();
+    Tritset operator&(const Tritset &secondOperand);
+    Tritset operator|(const Tritset &secondOperand);
+    Tritset operator!();
     trit operator[](u__int idx) const;
-    tritsetSupport operator[](u__int idx);
-    tritset &operator=(const tritset &secondOperand);
+    TritsetSupport operator[](u__int idx);
+    Tritset &operator=(const Tritset &secondOperand);
     u__int capacity();
     std::unordered_map<trit, int> cardinality() const;
     u__int cardinality(trit value) const;
@@ -35,15 +38,15 @@ public:
     void shrink();
 };
 
-class tritsetSupport {
-    friend tritset;
+class TritsetSupport {
+    friend Tritset;
 private:
     u__int arrIndex;
     u__int tritIndexInByte;
-    tritset* ptr;
-    tritsetSupport(int arrIdx, int tritIdx, tritset *p);
+    Tritset* ptr;
+    TritsetSupport(int arrIdx, int tritIdx, Tritset *p);
 public:
-    tritsetSupport &operator=(trit operand);
+    TritsetSupport &operator=(trit operand);
     bool operator==(trit secondOperand);
     bool operator!=(trit secondOperand);
 };
