@@ -23,6 +23,7 @@ private:
 public:
     Tritset();
     explicit Tritset(int n);
+    Tritset(const Tritset &set);
     ~Tritset();
     Tritset operator&(const Tritset &secondOperand);
     Tritset operator|(const Tritset &secondOperand);

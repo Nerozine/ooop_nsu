@@ -7,7 +7,7 @@ Tritset &Tritset::operator=(const Tritset &secondOperand) {
     }
 
     auto *tempArr = new u__int[secondOperand.arrSize]();
-    memset(tempArr, 0,secondOperand.arrSize);
+    memset(tempArr, 0,secondOperand.arrSize * sizeof(u__int));
     delete[] this->arr;
     this->arr = tempArr;
     this->arrSize = secondOperand.arrSize;
@@ -20,7 +20,9 @@ Tritset &Tritset::operator=(const Tritset &secondOperand) {
 }
 
 
-Tritset::Tritset(): arr(nullptr), arrSize(0), arrLength(0), lastIndexInTrits(0) { }
+Tritset::Tritset(): arr(new u__int[10]()), arrSize(10), arrLength(0), lastIndexInTrits(0) {
+    memset(arr, 0, sizeof(u__int) * 10);
+}
 
 
 Tritset::~Tritset() {
@@ -55,7 +57,7 @@ Tritset Tritset::operator&(const Tritset &secondOperand) {
                 result[tmpIdx] = trit::tFalse;
             }
             else {
-                if ((t[tmpIdx] == trit::tTrue) && (result[tmpIdx]) == trit::tTrue) {
+                if ((result[tmpIdx] == trit::tTrue) && (t[tmpIdx] == trit::tTrue)) {
                     result[tmpIdx] = trit::tTrue;
                 }
                 else {
@@ -85,7 +87,6 @@ Tritset Tritset::operator|(const Tritset &secondOperand) {
     }
 
     for (u__int i = 0; i <= result.arrLength; i++) {
-        3+3;
         for (u__int j = 0; j < sizeof(u__int) * 4; j++) {
             u__int tmpIdx = i * 4 * sizeof(u__int) + j;
 
@@ -164,15 +165,21 @@ trit Tritset::operator[](u__int idx) const {
 
 
 Tritset::Tritset(int n): arr(new u__int[n / sizeof(u__int) / 4 + 1]()), arrSize(n / sizeof(u__int) / 4 + 1),
-                         lastIndexInTrits(0), arrLength(0) {
-    memset(arr, 0, n / sizeof(u__int) / 4 + 1 * sizeof(u__int));
+                        lastIndexInTrits(0), arrLength(0) {
+    memset(arr, 0, (n / sizeof(u__int) / 4 + 1) * sizeof(u__int));
+}
+
+Tritset::Tritset(const Tritset &set): arr(new u__int[set.arrSize]()),
+                        arrSize(set.arrSize), lastIndexInTrits(set.lastIndexInTrits), arrLength(set.arrLength) {
+    memset(arr, 0, arrSize * sizeof(u__int));
+    memcpy(arr, set.arr, (set.arrLength + 1) * sizeof(u__int));
 }
 
 
 TritsetSupport Tritset::operator[](u__int idx) {
-    if (idx > lastIndexInTrits && idx < arrSize * sizeof(u__int) * 4) {
-        lastIndexInTrits = idx;
-    }
+//    if (idx > lastIndexInTrits && idx < arrSize * sizeof(u__int) * 4) {
+//        lastIndexInTrits = idx;
+//    }
 
     u__int arrIdx = idx / sizeof(u__int) / 4;
     u__int tritIdxInByte = idx % (sizeof(u__int) * 4);
@@ -239,11 +246,17 @@ u__int Tritset::length() const {
 
 
 void Tritset::trim(u__int lastIdx) {
-    // remember lastIdx, but lastIdx+1 don't
-    for (u__int i = lastIdx + 1; i <= lastIndexInTrits; i++) {
+    // forget all trits form lastIdx including lastidx
+    for (u__int i = lastIdx; i <= lastIndexInTrits; i++) {
         (*this)[i] = trit::tUnknown;
     }
-    lastIndexInTrits = lastIdx;
+    if (lastIndexInTrits > lastIdx) {
+        if (lastIdx > 1) {
+            lastIndexInTrits = lastIdx - 1;
+        } else {
+            lastIndexInTrits = 0;
+        }
+    }
     arrLength = lastIdx / 4 / sizeof(u__int) + 1;
 }
 
@@ -255,13 +268,14 @@ void Tritset::shrink() {
     memcpy(newArr, this->arr, (arrLength + 1) * sizeof(u__int));
     delete [] this->arr;
     this->arr = newArr;
+    this->arrSize = arrLength + 1;
 }
 
 
 void Tritset::expandArray(Tritset *t, u__int newSizeInUiBytes) {
     auto newArr = new u__int[newSizeInUiBytes]();
     memset(newArr, 0, newSizeInUiBytes * sizeof(u__int));
-    memcpy(newArr, t->arr, t->arrLength + 1);
+    memcpy(newArr, t->arr, (t->arrLength + 1) * sizeof(u__int));
     delete [] t->arr;
     t->arr = newArr;
     t->arrSize = newSizeInUiBytes;
@@ -318,7 +332,7 @@ TritsetSupport &TritsetSupport::operator=(trit operand) {
         return *this;
     }
 
-    if (operand != trit::tUnknown && arrIndex > ptr->arrSize) {
+    if (operand != trit::tUnknown && arrIndex >= ptr->arrSize) {
         auto newArr = new u__int[arrIndex + 1]();
         memset(newArr, 0, (arrIndex + 1) * sizeof(u__int));
         memcpy(newArr, ptr->arr, (ptr->arrLength + 1) * sizeof(u__int));
@@ -332,8 +346,8 @@ TritsetSupport &TritsetSupport::operator=(trit operand) {
         ptr->arrLength = arrIndex;
     }
 
-    if (ptr->lastIndexInTrits < arrIndex * sizeof(u__int) * 4 +tritIndexInByte) {
-        ptr->lastIndexInTrits = arrIndex * sizeof(u__int) * 4 +tritIndexInByte;
+    if (ptr->lastIndexInTrits < arrIndex * sizeof(u__int) * 4 + tritIndexInByte) {
+        ptr->lastIndexInTrits = arrIndex * sizeof(u__int) * 4 + tritIndexInByte;
     }
 
     u__int mask = 0;
@@ -363,6 +377,18 @@ TritsetSupport &TritsetSupport::operator=(trit operand) {
     }
 
     ptr->arr[arrIndex] = arrByteTmp | tmp;
+
+    if (operand == trit::tUnknown && arrIndex * sizeof(u__int) * 4 + tritIndexInByte == ptr->lastIndexInTrits
+            && ptr->lastIndexInTrits != 0) {
+        u__int i;
+        for (i = ptr->lastIndexInTrits - 1;; i--) {
+            if ((*ptr)[i] != trit::tUnknown || i == 0) {
+                ptr->lastIndexInTrits = i;
+                ptr->arrLength = i / (sizeof(u__int) * 4);
+                break;
+            }
+        }
+    }
 
     return *this;
 }
