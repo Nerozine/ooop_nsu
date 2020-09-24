@@ -4,74 +4,47 @@
 using testing::Eq;
 
 
-
-TEST(TritSetTest, CapacityTest) {
-    int n = 1000;
-    Tritset set(n);
+TEST(Task_page, Task_page) {
+    //резерв памяти для хранения 1000 тритов
+    Tritset set(1000);
+    // length of internal array
     size_t allocLength = set.capacity();
+    EXPECT_TRUE(allocLength >= 1000 * 2 / 8 / sizeof(uint));
+    // 1000*2 - min bits count
+    // 1000*2 / 8 - min bytes count
+    // 1000*2 / 8 / sizeof(uint) - min uint[] size
 
-    // n*2 - min bits count
-    // n*2 / 8 - min bytes count
-    // n*2 / 8 / sizeof(uint) - min uint[] size
-    ASSERT_GE(allocLength, (n*2 / 8 / sizeof(uint)));
-}
-
-TEST(TritSetTest, NoAllocTest) {
-    int n = 1000;
-    Tritset set(n);
-    unsigned int allocLength = set.capacity();
-    set[1000000] = trit::tUnknown;
-    ASSERT_EQ(allocLength, set.capacity());
-    EXPECT_TRUE(set[1000000] == trit::tUnknown);
-}
-
-TEST(TritSetTest, AllocTest) {
-    int n = 1000;
-    Tritset set(n);
-    size_t allocLength = set.capacity();
-    set[1000000000] = trit::tTrue;
-    ASSERT_LT(allocLength, set.capacity());
-    EXPECT_TRUE(set[1000000000] == trit::tTrue);
-}
-
-TEST(TritSetTest, ShrinkTest) {
-    int n = 1000;
-    Tritset set(n);
-    set[1000000000] = trit::tTrue;
-    size_t allocLength = set.capacity();
-    set.shrink();
+    //не выделяет никакой памяти
+    set[1000000000] = trit::tUnknown;
     EXPECT_TRUE(allocLength == set.capacity());
-}
 
-TEST(TritSetTest, ANDTest) {
+    // false, but no exception or memory allocation
+    if (set[2000000000] == trit::tTrue) {}
+    EXPECT_TRUE(allocLength == set.capacity());
+
+    //выделение памяти
+    set[1000000000] = trit::tTrue;
+    EXPECT_TRUE(allocLength < set.capacity());
+
+    //no memory operations
+    allocLength = set.capacity();
+    set[1000000000] = trit::tUnknown;
+    set[1000000] = trit::tFalse;
+    EXPECT_TRUE(allocLength == set.capacity());
+
+    //освобождение памяти до начального значения или
+    //до значения необходимого для хранения последнего установленного трита
+    //в данном случае для трита 1000’000
+    set.shrink();
+    EXPECT_TRUE(allocLength > set.capacity());
+
     Tritset setA(1000);
     Tritset setB(2000);
-    Tritset setC;
-    setC = setA & setB;
+    Tritset setC = setA & setB;
     EXPECT_TRUE(setC.capacity() == setB.capacity());
 }
 
-TEST(TritSetTest, TrueCardinalityTest) {
-    Tritset set(1000);
-    set[2] = trit::tTrue;
-    ASSERT_EQ(set.cardinality(trit::tTrue), 1);
-}
-
-TEST(TritSetTest, TrueCardinalityTest2) {
-    Tritset set(1000);
-    set[1] = trit::tFalse;
-    set[2] = trit::tFalse;
-    set[3] = trit::tTrue;
-    ASSERT_EQ(set.cardinality(trit::tTrue), 1);
-}
-
-TEST(TritSetTest, UnknownCardinalityTest) {
-    Tritset set(1000);
-    set[2] = trit::tTrue;
-    ASSERT_EQ(set.cardinality(trit::tUnknown), 2);
-}
-
-TEST(TritSetTest, TrimTest) {
+TEST(Trim, part0) {
     Tritset set(1000);
     set[1] = trit::tFalse;
     set[2] = trit::tFalse;
@@ -81,54 +54,6 @@ TEST(TritSetTest, TrimTest) {
     EXPECT_TRUE(set[2] == trit::tUnknown);
     EXPECT_TRUE(set[3] == trit::tUnknown);
 }
-
-TEST(TritSetTest, LengthTest) {
-    Tritset set(1000);
-    set[1] = trit::tFalse;
-    set[2] = trit::tFalse;
-    set[3] = trit::tTrue;
-    ASSERT_EQ(set.length(), 4);
-}
-
-//TEST(Task_page, Task_page) {
-//    //резерв памяти для хранения 1000 тритов
-//    Tritset set(1000);
-//    // length of internal array
-//    size_t allocLength = set.capacity();
-//    EXPECT_TRUE(allocLength >= 1000 * 2 / 8 / sizeof(uint));
-//    // 1000*2 - min bits count
-//    // 1000*2 / 8 - min bytes count
-//    // 1000*2 / 8 / sizeof(uint) - min uint[] size
-//
-//    //не выделяет никакой памяти
-//    set[1000000000] = trit::tUnknown;
-//    EXPECT_TRUE(allocLength == set.capacity());
-//
-//    // false, but no exception or memory allocation
-//    if (set[2000000000] == trit::tTrue) {}
-//    EXPECT_TRUE(allocLength == set.capacity());
-//
-//    //выделение памяти
-//    set[1000000000] = trit::tTrue;
-//    EXPECT_TRUE(allocLength < set.capacity());
-//
-//    //no memory operations
-//    allocLength = set.capacity();
-//    set[1000000000] = trit::tUnknown;
-//    set[1000000] = trit::tFalse;
-//    EXPECT_TRUE(allocLength == set.capacity());
-//
-//    //освобождение памяти до начального значения или
-//    //до значения необходимого для хранения последнего установленного трита
-//    //в данном случае для трита 1000’000
-//    set.shrink();
-//    EXPECT_TRUE(allocLength > set.capacity());
-//
-//    Tritset setA(1000);
-//    Tritset setB(2000);
-//    Tritset setC = setA & setB;
-//    EXPECT_TRUE(setC.capacity() == setB.capacity());
-//}
 
 TEST(Trim, part1) {
     Tritset set;
@@ -161,6 +86,15 @@ TEST(Trim, part2) {
         EXPECT_TRUE(set[i] == trit::tTrue);
     }
     EXPECT_TRUE(set.length() == 80);
+}
+
+TEST(Shrink, part0) {
+    int n = 1000;
+    Tritset set(n);
+    set[1000000000] = trit::tTrue;
+    size_t allocLength = set.capacity();
+    set.shrink();
+    EXPECT_TRUE(allocLength == set.capacity());
 }
 
 TEST(Shrink, part1) {
@@ -272,7 +206,7 @@ TEST(Cardinality, Map_cardinality) {
     std::unordered_map<trit, int> count = set.cardinality();
 
     EXPECT_TRUE(count[trit::tFalse] == 7);
-    EXPECT_TRUE(count[trit::tUnknown] == 8); //1, 6, 10, 11, 15, 17, 20, 21
+    EXPECT_TRUE(count[trit::tUnknown] == 8);
     EXPECT_TRUE(count[trit::tTrue] == 8);
 
 }
@@ -355,6 +289,39 @@ TEST(Memory_reallocation, reallocation) {
     }
 }
 
+TEST(LengthTest, part0) {
+    Tritset set(1000);
+    set[1] = trit::tFalse;
+    set[2] = trit::tFalse;
+    set[3] = trit::tTrue;
+    EXPECT_TRUE(set.length() == 4);
+}
+
+TEST (LengthTest, part1) {
+    Tritset set(1000);
+    set[1] = trit::tFalse;
+    set[2] = trit::tFalse;
+    set[333] = trit::tTrue;
+    set[555] = trit::tFalse;
+
+    EXPECT_TRUE(set.length() == 556);
+
+    set[565] = trit::tFalse;
+    EXPECT_TRUE(set.length() == 566);
+
+    set[565] = trit::tUnknown;
+    set[555] = trit::tUnknown;
+    EXPECT_TRUE(set.length() == 334);
+
+    set[787] = trit::tTrue;
+    set[789] = trit::tUnknown;
+    set[700] = trit::tFalse;
+    EXPECT_TRUE(set.length() == 788);
+
+    set[787] = trit::tUnknown;
+    EXPECT_TRUE(set.length() == 701);
+}
+
 TEST(trit_operator, AND) {
     trit F = trit::tFalse, U = trit::tUnknown, T = trit::tTrue;
 
@@ -383,56 +350,7 @@ TEST(trit_operator, NOT) {
     EXPECT_TRUE(!U == trit::tUnknown);
     EXPECT_TRUE(!T == trit::tFalse);
 }
-/*
-TEST(trit_operator, assignment) {
-    trit U, F, T;
-    Tritset set(3);
-    set[0] = trit::tUnknown;
-    set[1] = trit::tFalse;
-    set[2] = trit::tTrue;
-    U = set[0];
-    F = set[1];
-    T = set[2];
-    EXPECT_TRUE(U == trit::tUnknown);
-    EXPECT_TRUE(F == trit::tFalse);
-    EXPECT_TRUE(T == trit::tTrue);
-    set[0] = T;
-    set[1] = U;
-    set[2] = F;
-    EXPECT_TRUE(set[0] == trit::tTrue);
-    EXPECT_TRUE(set[1] == trit::tUnknown);
-    EXPECT_TRUE(set[2] == trit::tFalse);
-}
 
-TEST(Tritset_Operator, assignment) {
-    Tritset setA(100), setB;
-    setA[88] = trit::tTrue;
-    setA[70] = trit::tTrue;
-    setA[50] = trit::tUnknown;
-    setA[24] = trit::tFalse;
-    uint n = setA.capacity(), m = setA.length();
-    setB = setA;
-    setB[70] = trit::tFalse;
-    setB[50] = trit::tFalse;
-    setB[24] = trit::tFalse;
-    setB.trim(60);
-
-    EXPECT_TRUE(setA[70] == trit::tTrue);
-    EXPECT_TRUE(setA[50] == trit::tUnknown);
-    EXPECT_TRUE(setA[24] == trit::tFalse);
-    EXPECT_TRUE(setA[88] == trit::tTrue);
-
-    EXPECT_TRUE(setB[88] == trit::tUnknown);
-    EXPECT_TRUE(setB[70] == trit::tUnknown);
-    EXPECT_TRUE(setB[50] == trit::tFalse);
-    EXPECT_TRUE(setB[24] == trit::tFalse);
-
-    EXPECT_TRUE(setA.capacity() == n);
-    EXPECT_TRUE(setA.length() == m);
-    EXPECT_TRUE(setB.length() < setA.length());
-    EXPECT_TRUE(setA.capacity() == setB.capacity());
-}
-*/
 TEST(Tritset_Operator, AND) {
     Tritset setA, setB, setC;
     setA[1] = trit::tFalse;

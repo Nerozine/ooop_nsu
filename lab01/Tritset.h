@@ -3,7 +3,6 @@
 #include <cstring>
 #include <cstdlib>
 #include <unordered_map>
-#include <iostream>
 
 
 typedef unsigned int u__int;
@@ -19,7 +18,8 @@ private:
     int arrLength; // Current length in u__int
     int arrSize; // Array max size in u__int
     int lastIndexInTrits; // Last array index in trits
-    void expandArray(Tritset *t, u__int newSizeInUiBytes);
+    void expandArray(u__int newSizeInUiBytes);
+    void resetLastIndexInTrits();
 public:
     Tritset();
     explicit Tritset(int n);

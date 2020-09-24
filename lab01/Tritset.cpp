@@ -7,7 +7,6 @@ Tritset &Tritset::operator=(const Tritset &secondOperand) {
     }
 
     auto *tempArr = new u__int[secondOperand.arrSize]();
-    memset(tempArr, 0,secondOperand.arrSize * sizeof(u__int));
     delete[] this->arr;
     this->arr = tempArr;
     this->arrSize = secondOperand.arrSize;
@@ -20,9 +19,7 @@ Tritset &Tritset::operator=(const Tritset &secondOperand) {
 }
 
 
-Tritset::Tritset(): arr(new u__int[10]()), arrSize(10), arrLength(0), lastIndexInTrits(0) {
-    memset(arr, 0, sizeof(u__int) * 10);
-}
+Tritset::Tritset(): arr(new u__int[10]()), arrSize(10), arrLength(0), lastIndexInTrits(0) {}
 
 
 Tritset::~Tritset() {
@@ -37,12 +34,12 @@ Tritset Tritset::operator&(const Tritset &secondOperand) {
     if (this->arrLength > secondOperand.arrLength) {
         result = *this;
         t = secondOperand;
-        expandArray(&t, result.arrSize);
+        t.expandArray(result.arrSize);
     }
     else {
         result = secondOperand;
         t = *this;
-        expandArray(&t, result.arrSize);
+        t.expandArray(result.arrSize);
     }
 
     for (u__int i = 0; i <= result.arrLength; i++) {
@@ -78,12 +75,12 @@ Tritset Tritset::operator|(const Tritset &secondOperand) {
     if (this->arrLength > secondOperand.arrLength) {
         result = *this;
         t = secondOperand;
-        expandArray(&t, result.arrSize);
+        t.expandArray(result.arrSize);
     }
     else {
         result = secondOperand;
         t = *this;
-        expandArray(&t, result.arrSize);
+        t.expandArray(result.arrSize);
     }
 
     for (u__int i = 0; i <= result.arrLength; i++) {
@@ -165,31 +162,23 @@ trit Tritset::operator[](u__int idx) const {
 
 
 Tritset::Tritset(int n): arr(new u__int[n / sizeof(u__int) / 4 + 1]()), arrSize(n / sizeof(u__int) / 4 + 1),
-                        lastIndexInTrits(0), arrLength(0) {
-    memset(arr, 0, (n / sizeof(u__int) / 4 + 1) * sizeof(u__int));
-}
+                         lastIndexInTrits(0), arrLength(0) {}
 
 Tritset::Tritset(const Tritset &set): arr(new u__int[set.arrSize]()),
-                        arrSize(set.arrSize), lastIndexInTrits(set.lastIndexInTrits), arrLength(set.arrLength) {
-    memset(arr, 0, arrSize * sizeof(u__int));
+                                      arrSize(set.arrSize), lastIndexInTrits(set.lastIndexInTrits), arrLength(set.arrLength) {
     memcpy(arr, set.arr, (set.arrLength + 1) * sizeof(u__int));
 }
 
 
 TritsetSupport Tritset::operator[](u__int idx) {
-//    if (idx > lastIndexInTrits && idx < arrSize * sizeof(u__int) * 4) {
-//        lastIndexInTrits = idx;
-//    }
-
     u__int arrIdx = idx / sizeof(u__int) / 4;
     u__int tritIdxInByte = idx % (sizeof(u__int) * 4);
-
     return TritsetSupport(arrIdx, tritIdxInByte, this);
 }
 
 
 u__int Tritset::capacity() {
-     return arrSize * 4 * sizeof(u__int);
+    return arrSize * 4 * sizeof(u__int);
 }
 
 
@@ -246,7 +235,7 @@ u__int Tritset::length() const {
 
 
 void Tritset::trim(u__int lastIdx) {
-    // forget all trits form lastIdx including lastidx
+    // forgets all trits form lastIdx including lastidx
     for (u__int i = lastIdx; i <= lastIndexInTrits; i++) {
         (*this)[i] = trit::tUnknown;
     }
@@ -264,7 +253,6 @@ void Tritset::trim(u__int lastIdx) {
 void Tritset::shrink() {
     // memory free from the last seted trit
     auto newArr = new u__int[arrLength]();
-    memset(newArr, 0, arrLength * sizeof(u__int));
     memcpy(newArr, this->arr, (arrLength + 1) * sizeof(u__int));
     delete [] this->arr;
     this->arr = newArr;
@@ -272,13 +260,12 @@ void Tritset::shrink() {
 }
 
 
-void Tritset::expandArray(Tritset *t, u__int newSizeInUiBytes) {
+void Tritset::expandArray(u__int newSizeInUiBytes) {
     auto newArr = new u__int[newSizeInUiBytes]();
-    memset(newArr, 0, newSizeInUiBytes * sizeof(u__int));
-    memcpy(newArr, t->arr, (t->arrLength + 1) * sizeof(u__int));
-    delete [] t->arr;
-    t->arr = newArr;
-    t->arrSize = newSizeInUiBytes;
+    memcpy(newArr, this->arr, (this->arrLength + 1) * sizeof(u__int));
+    delete [] this->arr;
+    this->arr = newArr;
+    this->arrSize = newSizeInUiBytes;
 }
 
 
@@ -333,12 +320,7 @@ TritsetSupport &TritsetSupport::operator=(trit operand) {
     }
 
     if (operand != trit::tUnknown && arrIndex >= ptr->arrSize) {
-        auto newArr = new u__int[arrIndex + 1]();
-        memset(newArr, 0, (arrIndex + 1) * sizeof(u__int));
-        memcpy(newArr, ptr->arr, (ptr->arrLength + 1) * sizeof(u__int));
-        delete [] ptr->arr;
-        ptr->arr = newArr;
-        ptr->arrSize = arrIndex + 1;
+        ptr->expandArray(arrIndex + 1);
         ptr->arrLength = arrIndex;
     }
 
@@ -379,23 +361,37 @@ TritsetSupport &TritsetSupport::operator=(trit operand) {
     ptr->arr[arrIndex] = arrByteTmp | tmp;
 
     if (operand == trit::tUnknown && arrIndex * sizeof(u__int) * 4 + tritIndexInByte == ptr->lastIndexInTrits
-            && ptr->lastIndexInTrits != 0) {
-        u__int i;
-        for (i = ptr->lastIndexInTrits - 1;; i--) {
-            if ((*ptr)[i] != trit::tUnknown || i == 0) {
-                ptr->lastIndexInTrits = i;
-                ptr->arrLength = i / (sizeof(u__int) * 4);
-                break;
-            }
-        }
+        && ptr->lastIndexInTrits != 0) {
+        ptr->resetLastIndexInTrits();
     }
 
     return *this;
 }
 
 
+void Tritset::resetLastIndexInTrits() {
+    u__int j = this->lastIndexInTrits / (sizeof(u__int) * 4);
+    while (this->arr[j] == 0) {
+        if (j == 0) {
+            this->lastIndexInTrits = 0;
+            this->arrLength = 0;
+            return;
+        }
+        j--;
+    }
+
+    for (u__int i = j * sizeof(u__int) * 4 + (sizeof(u__int) * 4 - 1);; i--) {
+        if ((*this)[i] != trit::tUnknown || i == 0) {
+            this->lastIndexInTrits = i;
+            this->arrLength = i / (sizeof(u__int) * 4);
+            break;
+        }
+    }
+}
+
+
 TritsetSupport::TritsetSupport(int arrIdx, int tritIdx, Tritset *p):
-    arrIndex(arrIdx), tritIndexInByte(tritIdx), ptr(p) {}
+        arrIndex(arrIdx), tritIndexInByte(tritIdx), ptr(p) {}
 
 
 bool TritsetSupport::operator==(const trit secondOperand) {
