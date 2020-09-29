@@ -4,7 +4,7 @@
 using testing::Eq;
 
 
-TEST(Task_page, Task_page) {
+TEST(FirstTest, part0) {
     //резерв памяти для хранения 1000 тритов
     Tritset set(1000);
     // length of internal array
@@ -136,7 +136,7 @@ TEST(Shrink, part2) {
     EXPECT_TRUE(m == set.length());
 }
 
-TEST(Cardinality, Cardinality) {
+TEST(Cardinality, part0) {
     Tritset set;
     set[22] = trit::tFalse;
     set[19] = trit::tTrue;
@@ -185,7 +185,7 @@ TEST(Cardinality, Cardinality) {
     EXPECT_TRUE(set.cardinality(trit::tTrue) == 8);
 }
 
-TEST(Cardinality, Map_cardinality) {
+TEST(MapCardinality, part0) {
     Tritset set;
     set[0] = trit::tTrue;
     set[2] = trit::tFalse;
@@ -238,7 +238,7 @@ TEST(Constructor, Constructor) {
     }
 }
 
-TEST(Constructor, Copy_Constructor) {
+TEST(CopyConstructor, part0) {
     Tritset setA(100);
     setA[70] = trit::tTrue;
     setA[50] = trit::tUnknown;
@@ -259,7 +259,39 @@ TEST(Constructor, Copy_Constructor) {
     EXPECT_TRUE(setA.capacity() == setB.capacity());
 }
 
-TEST(Memory_reallocation, no_reallocation) {
+TEST(CopyConstructor, part1) {
+    Tritset set(100);
+    set[88] = trit::tTrue;
+    set[70] = trit::tTrue;
+    set[50] = trit::tUnknown;
+    set[24] = trit::tFalse;
+
+    unsigned int n = set.capacity();
+    unsigned int m = set.length();
+
+    Tritset set1 = set;
+
+    EXPECT_TRUE(set1[70] == trit::tTrue);
+    EXPECT_TRUE(set1[50] == trit::tUnknown);
+    EXPECT_TRUE(set1[24] == trit::tFalse);
+    EXPECT_TRUE(set1[88] == trit::tTrue);
+    EXPECT_TRUE(set1.capacity() == n);
+    EXPECT_TRUE(set1.length() == m);
+}
+
+TEST(CopyConstructor, part2) {
+    Tritset set(100);
+    for (int i = 0; i < 100; i++) {
+        set[i] = static_cast<trit>(i % 3);
+    }
+
+    Tritset set1 = set;
+    for (int i = 0; i < 100; i++) {
+        EXPECT_TRUE(set1[i] == static_cast<trit>(i % 3));
+    }
+}
+
+TEST(MemoryReallocation, part0) { // NoReallocation
     Tritset set(30);
     uint cap = set.capacity();
     for (uint i = 0; i < 30; i++) {
@@ -269,10 +301,11 @@ TEST(Memory_reallocation, no_reallocation) {
     set[31] = trit::tUnknown;
     set[40] = trit::tUnknown;
     set[100] = trit::tUnknown;
+    set[10000] = trit::tUnknown;
     EXPECT_TRUE(cap == set.capacity());
 }
 
-TEST(Memory_reallocation, reallocation) {
+TEST(MemoryReallocation, part1) { // Reallocation
     Tritset set;
 
     for (uint i = 0; i < 30; i++) {
@@ -351,7 +384,7 @@ TEST(trit_operator, NOT) {
     EXPECT_TRUE(!T == trit::tFalse);
 }
 
-TEST(Tritset_Operator, AND) {
+TEST(TritsetOperator, AND) {
     Tritset setA, setB, setC;
     setA[1] = trit::tFalse;
     setA[3] = trit::tFalse;
@@ -402,7 +435,7 @@ TEST(Tritset_Operator, AND) {
     EXPECT_TRUE(setC.capacity() == capB);
 }
 
-TEST(Tritset_Operator, OR) {
+TEST(TritsetOperator, OR) {
     Tritset setA, setB, setC;
     setA[5] = trit::tTrue;
     setA[3] = trit::tFalse;
@@ -453,7 +486,7 @@ TEST(Tritset_Operator, OR) {
     EXPECT_TRUE(setC.capacity() == capB);
 }
 
-TEST(Tritset_Operator, NOT) {
+TEST(TritsetOperator, NOT) {
     Tritset setA(100);
     setA[0] = trit::tTrue;
     setA[1] = trit::tFalse;

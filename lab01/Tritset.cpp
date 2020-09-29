@@ -236,7 +236,17 @@ u__int Tritset::length() const {
 
 void Tritset::trim(u__int lastIdx) {
     // forgets all trits form lastIdx including lastidx
-    for (u__int i = lastIdx; i <= lastIndexInTrits; i++) {
+    if (lastIndexInTrits - lastIdx >= sizeof(u__int) * 4 && lastIdx / (sizeof(u__int) * 4) + 1 <= arrSize) {
+        u__int loopBorder =  lastIndexInTrits / (sizeof(u__int) * 4) + 1;
+        for (u__int i = lastIdx / (sizeof(u__int) * 4) + 1; i < loopBorder && i < arrSize; i++) {
+            arr[i] = 0;
+        }
+    }
+
+    u__int lastIdxByteBorder = lastIndexInTrits / (sizeof(u__int) * 4) + 1;
+    lastIdxByteBorder = lastIdxByteBorder * sizeof(u__int) * 4;
+
+    for (u__int i = lastIdx; i < lastIdxByteBorder; i++) {
         (*this)[i] = trit::tUnknown;
     }
     if (lastIndexInTrits > lastIdx) {
