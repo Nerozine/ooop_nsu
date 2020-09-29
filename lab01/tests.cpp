@@ -89,9 +89,9 @@ TEST(Trim, part2) {
 }
 
 TEST(Shrink, part0) {
-    int n = 1000;
+    int n = 10;
     Tritset set(n);
-    set[1000000000] = trit::tTrue;
+    set[1000000] = trit::tTrue;
     size_t allocLength = set.capacity();
     set.shrink();
     EXPECT_TRUE(allocLength == set.capacity());
