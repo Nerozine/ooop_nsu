@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Tritset.h"
 #include "gtest/gtest.h"
-
+#include "./tests/tests.cpp"
 
 using namespace std;
 
