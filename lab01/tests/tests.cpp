@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "Tritset.h"
+#include "../Tritset.h"
 
 using testing::Eq;
 
