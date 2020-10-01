@@ -236,6 +236,8 @@ u__int Tritset::length() const {
 
 void Tritset::trim(u__int lastIdx) {
     // forgets all trits form lastIdx including lastidx
+
+    // lastIdx and lastIndexInTrits is from the same u__int && lastIdx u__int index in array <= arrSize
     if (lastIndexInTrits - lastIdx >= sizeof(u__int) * 4 && lastIdx / (sizeof(u__int) * 4) + 1 <= arrSize) {
         u__int loopBorder =  lastIndexInTrits / (sizeof(u__int) * 4) + 1;
         for (u__int i = lastIdx / (sizeof(u__int) * 4) + 1; i < loopBorder && i < arrSize; i++) {
@@ -324,21 +326,23 @@ trit operator&(const trit &firstOperand, const trit &secondOperand) {
 
 
 TritsetSupport &TritsetSupport::operator=(trit operand) {
-    // expands arr if not enough size and operand!=tritUnknown
     if (operand == trit::tUnknown && arrIndex > ptr->arrSize) {
         return *this;
     }
 
+    // expands arr if not enough size and operand != tUnknown
     if (operand != trit::tUnknown && arrIndex >= ptr->arrSize) {
         ptr->expandArray(arrIndex + 1);
         ptr->arrLength = arrIndex;
     }
 
     if (ptr->arrLength < arrIndex) {
+        // seting new arrLength
         ptr->arrLength = arrIndex;
     }
 
     if (ptr->lastIndexInTrits < arrIndex * sizeof(u__int) * 4 + tritIndexInByte) {
+        // seting new lastIndexInTrits
         ptr->lastIndexInTrits = arrIndex * sizeof(u__int) * 4 + tritIndexInByte;
     }
 
