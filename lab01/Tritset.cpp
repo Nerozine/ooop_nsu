@@ -27,7 +27,7 @@ Tritset::~Tritset() {
 }
 
 
-Tritset Tritset::operator&(const Tritset &secondOperand) {
+Tritset Tritset::operator&(const Tritset &secondOperand) const {
     Tritset result;
     Tritset t;
 
@@ -68,7 +68,7 @@ Tritset Tritset::operator&(const Tritset &secondOperand) {
 }
 
 
-Tritset Tritset::operator|(const Tritset &secondOperand) {
+Tritset Tritset::operator|(const Tritset &secondOperand) const {
     Tritset result;
     Tritset t;
 
@@ -109,7 +109,7 @@ Tritset Tritset::operator|(const Tritset &secondOperand) {
 }
 
 
-Tritset Tritset::operator!() {
+Tritset Tritset::operator!() const {
     Tritset result = *this;
 
     for (u__int i = 0; i <= result.arrLength; i++) {
@@ -465,4 +465,39 @@ bool TritsetSupport::operator!=(const trit secondOperand) {
             std::exit(14);
         }
     }
+}
+
+TritsetSupport &TritsetSupport::operator=(const TritsetSupport &t) {
+    if (this == &t) {
+        return *this;
+    }
+
+    u_int maskT = 0;
+    u__int h = (3u << (2 * t.tritIndexInByte));
+    maskT = maskT  |  (3u << (2 * t.tritIndexInByte));
+
+    maskT = maskT & (t.ptr->arr[t.arrIndex]);
+    maskT = maskT >> (2 * t.tritIndexInByte);
+    trit toAssign;
+    switch (maskT) {
+        case 0: {
+            toAssign = trit::tUnknown;
+            break;
+        }
+        case 1: {
+            toAssign = trit::tTrue;
+            break;
+        }
+        case 2: {
+            toAssign = trit::tFalse;
+            break;
+        }
+        default: {
+            exit(14);
+        }
+    }
+
+    (*(this->ptr))[arrIndex * sizeof(u__int) * 4 + tritIndexInByte] = toAssign;
+
+    return *this;
 }

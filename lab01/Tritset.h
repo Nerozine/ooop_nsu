@@ -25,9 +25,9 @@ public:
     explicit Tritset(int n);
     Tritset(const Tritset &set);
     ~Tritset();
-    Tritset operator&(const Tritset &secondOperand);
-    Tritset operator|(const Tritset &secondOperand);
-    Tritset operator!();
+    Tritset operator&(const Tritset &secondOperand) const;
+    Tritset operator|(const Tritset &secondOperand) const ;
+    Tritset operator!() const;
     trit operator[](u__int idx) const;
     TritsetSupport operator[](u__int idx);
     Tritset &operator=(const Tritset &secondOperand);
@@ -50,6 +50,7 @@ public:
     TritsetSupport &operator=(trit operand);
     bool operator==(trit secondOperand);
     bool operator!=(trit secondOperand);
+    TritsetSupport &operator=(const TritsetSupport &t);
 };
 
 
