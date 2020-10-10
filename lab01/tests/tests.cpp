@@ -511,3 +511,63 @@ TEST(TritsetOperator, NOT) {
     EXPECT_TRUE(setB[4] == trit::tUnknown);
     EXPECT_TRUE(setB[5] == trit::tTrue);
 }
+
+TEST(SingleTritAssignment, part0) {
+    Tritset setA(100);
+    setA[0] = trit::tTrue;
+    setA[1] = trit::tFalse;
+    setA[2] = trit::tTrue;
+    setA[5] = trit::tFalse;
+    Tritset setB(100);
+
+    setB[0] = setA[0];
+    setB[1] = setA[1];
+    setB[2] = setA[2];
+    setB[5] = setA[5];
+
+    EXPECT_TRUE(setB[0] == trit::tTrue);
+    EXPECT_TRUE(setB[1] == trit::tFalse);
+    EXPECT_TRUE(setB[2] == trit::tTrue);
+    EXPECT_TRUE(setB[3] == trit::tUnknown);
+    EXPECT_TRUE(setB[4] == trit::tUnknown);
+    EXPECT_TRUE(setB[5] == trit::tFalse);
+}
+
+TEST(SingleTritAssignment, part1) {
+    Tritset setA(1000);
+    Tritset setB(1000);
+    setA[232] = trit::tFalse;
+    setA[578] = trit::tTrue;
+    setA[333] = trit::tFalse;
+    setA[881] = trit::tTrue;
+
+    setB[678] = setA[232];
+    EXPECT_TRUE(setB[678] == trit::tFalse);
+
+    setB[45] = setA[881];
+    EXPECT_TRUE(setB[45] == trit::tTrue);
+
+    setB[665] = setA[333];
+    EXPECT_TRUE(setB[665] == trit::tFalse);
+
+    setB[999] = setA[578];
+    EXPECT_TRUE(setB[999] == trit::tTrue);
+}
+
+TEST(SingleTritAssignment, part2) {
+    Tritset setA(1000);
+    Tritset setB(1000);
+    for (int i = 0; i < 1000; i++) {
+        setA[i] = static_cast<trit>(i % 3);
+    }
+
+    for (int i = 0; i < 999; i++) {
+        setB[i] = setA[i+1];
+    }
+
+    for (int i = 0; i < 999; i++) {
+        EXPECT_TRUE(setB[i] == static_cast<trit>((i + 1) % 3));
+    }
+}
+
+
