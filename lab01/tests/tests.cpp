@@ -41,7 +41,7 @@ TEST(FirstTest, part0) {
     Tritset setA(1000);
     Tritset setB(2000);
     Tritset setC = setA & setB;
-    EXPECT_TRUE(setC.capacity() == setB.capacity());
+    EXPECT_TRUE(setC.capacity() >= setB.capacity());
 }
 
 TEST(Trim, part0) {
@@ -256,7 +256,7 @@ TEST(CopyConstructor, part0) {
     EXPECT_TRUE(setB[50] == trit::tFalse);
     EXPECT_TRUE(setB[24] == trit::tFalse);
     EXPECT_TRUE(setB.length() < setA.length());
-    EXPECT_TRUE(setA.capacity() == setB.capacity());
+    EXPECT_TRUE(setA.capacity() <= setB.capacity());
 }
 
 TEST(CopyConstructor, part1) {
@@ -432,7 +432,7 @@ TEST(TritsetOperator, AND) {
 
     EXPECT_TRUE(setA.capacity() == capA);
     EXPECT_TRUE(setB.capacity() == capB);
-    EXPECT_TRUE(setC.capacity() == capB);
+    EXPECT_TRUE(setC.capacity() >= capB);
 }
 
 TEST(TritsetOperator, OR) {
@@ -483,7 +483,7 @@ TEST(TritsetOperator, OR) {
 
     EXPECT_TRUE(setA.capacity() == capA);
     EXPECT_TRUE(setB.capacity() == capB);
-    EXPECT_TRUE(setC.capacity() == capB);
+    EXPECT_TRUE(setC.capacity() >= capB);
 }
 
 TEST(TritsetOperator, NOT) {

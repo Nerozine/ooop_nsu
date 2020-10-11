@@ -1,12 +1,13 @@
 #ifndef OOOP_NSU_TRITSET_H
 #define OOOP_NSU_TRITSET_H
+#include "trit.h"
 #include <cstring>
 #include <cstdlib>
 #include <unordered_map>
+#include <iostream>
 
 
 typedef unsigned int u__int;
-enum class trit {tFalse = 2, tUnknown = 0, tTrue = 1};
 
 
 class TritsetSupport;
@@ -14,12 +15,17 @@ class TritsetSupport;
 class Tritset {
     friend TritsetSupport;
 private:
+    static const u__int tritsInUnsignedInt = sizeof(unsigned int) * 4;
     u__int *arr;
     int arrLength; // Current length in u__int
     int arrSize; // Array max size in u__int
     int lastIndexInTrits; // Last array index in trits
     void expandArray(u__int newSizeInUiBytes);
     void resetLastIndexInTrits();
+    void resetLastIndexInTrits(u__int index);
+    trit getTritByIndex(u__int index) const;
+    static u__int getMaxIndexInTrits(const Tritset &a, const Tritset &b);
+    static u__int getArrMaxSize(const Tritset &a, const Tritset &b);
 public:
     Tritset();
     explicit Tritset(int n);
@@ -52,11 +58,6 @@ public:
     bool operator!=(trit secondOperand);
     TritsetSupport &operator=(const TritsetSupport &t);
 };
-
-
-trit operator!(const trit &operand);
-trit operator|(const trit &firstOperand, const trit &secondOperand);
-trit operator&(const trit &firstOperand, const trit &secondOperand);
 
 
 #endif //OOOP_NSU_TRITSET_H
