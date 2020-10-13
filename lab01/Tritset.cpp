@@ -128,12 +128,12 @@ Tritset::Tritset(int n):
     arrLength(0) {}
 
 
-Tritset::Tritset(const Tritset &set):
-    arr(new u__int[set.arrSize]()),
-    arrSize(set.arrSize),
-    lastIndexInTrits(set.lastIndexInTrits),
-    arrLength(set.arrLength) {
-    memcpy(arr, set.arr, (set.arrLength + 1) * sizeof(u__int));
+Tritset::Tritset(const Tritset &t):
+    arr(new u__int[t.arrSize]()),
+    arrSize(t.arrSize),
+    lastIndexInTrits(t.lastIndexInTrits),
+    arrLength(t.arrLength) {
+    memcpy(arr, t.arr, (t.arrLength + 1) * sizeof(u__int));
 }
 
 
@@ -226,7 +226,7 @@ void Tritset::trim(u__int lastIdx) {
     }
 
     // now we need to forget trits only form the same unsigned int
-    for (u__int i = lastIdx; i <= lastIndexInTrits; i++) {
+    for (u__int i = lastIdx; i <= lastIndexInTrits && i < lastIdx + tritsInUnsignedInt; i++) {
         (*this)[i] = trit::tUnknown;
     }
 
@@ -245,14 +245,14 @@ void Tritset::shrink() {
 }
 
 
-void Tritset::expandArray(u__int newSizeInUiBytes) {
-    auto newArr = new u__int[newSizeInUiBytes]();
+void Tritset::expandArray(u__int newSize) {
+    auto newArr = new u__int[newSize]();
     if (this->arr != nullptr) {
         memcpy(newArr, this->arr, (this->arrLength + 1) * sizeof(u__int));
         delete [] this->arr;
     }
     this->arr = newArr;
-    this->arrSize = newSizeInUiBytes;
+    this->arrSize = newSize;
 }
 
 
@@ -272,19 +272,18 @@ TritsetSupport &TritsetSupport::operator=(trit operand) {
         ptr->arrLength = arrIndex;
     }
 
-    u__int tritsInUnsignedInt = sizeof(u__int) * 4;
-    if (ptr->lastIndexInTrits < arrIndex * tritsInUnsignedInt + tritIndexInByte) {
+    if (ptr->lastIndexInTrits < arrIndex * Tritset::tritsInUnsignedInt + tritIndexInByte) {
         // seting new lastIndexInTrits
-        ptr->lastIndexInTrits = arrIndex * tritsInUnsignedInt + tritIndexInByte;
+        ptr->lastIndexInTrits = arrIndex * Tritset::tritsInUnsignedInt + tritIndexInByte;
     }
 
     u__int mask = 0;
     u__int tmp = 0;
-    u__int arrByteTmp = ptr->arr[arrIndex];
+    u__int arrUIByteTmp = ptr->arr[arrIndex];
 
     mask |= (3u << (tritIndexInByte * 2));
     mask = ~mask;
-    arrByteTmp &= mask;
+    arrUIByteTmp &= mask;
 
     switch (operand) {
         case trit::tTrue: {
@@ -304,9 +303,9 @@ TritsetSupport &TritsetSupport::operator=(trit operand) {
         }
     }
 
-    ptr->arr[arrIndex] = arrByteTmp | tmp;
+    ptr->arr[arrIndex] = arrUIByteTmp | tmp;
 
-    if (arrIndex * tritsInUnsignedInt + tritIndexInByte == ptr->lastIndexInTrits && operand == trit::tUnknown
+    if (arrIndex * Tritset::tritsInUnsignedInt + tritIndexInByte == ptr->lastIndexInTrits && operand == trit::tUnknown
         && ptr->lastIndexInTrits != 0) {
         ptr->resetLastIndexInTrits();
     }
@@ -390,15 +389,15 @@ TritsetSupport &TritsetSupport::operator=(const TritsetSupport &t) {
 
     switch (tmp) {
         case 0: {
-            (*(this->ptr))[arrIndex * sizeof(u__int) * 4 + tritIndexInByte] = trit::tUnknown;
+            (*(this->ptr))[arrIndex * Tritset::tritsInUnsignedInt + tritIndexInByte] = trit::tUnknown;
             break;
         }
         case 1: {
-            (*(this->ptr))[arrIndex * sizeof(u__int) * 4 + tritIndexInByte] = trit::tTrue;
+            (*(this->ptr))[arrIndex * Tritset::tritsInUnsignedInt + tritIndexInByte] = trit::tTrue;
             break;
         }
         case 2: {
-            (*(this->ptr))[arrIndex * sizeof(u__int) * 4 + tritIndexInByte] = trit::tFalse;
+            (*(this->ptr))[arrIndex * Tritset::tritsInUnsignedInt + tritIndexInByte] = trit::tFalse;
             break;
         }
         default: {
