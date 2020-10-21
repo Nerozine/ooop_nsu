@@ -144,6 +144,12 @@ TritsetSupport Tritset::operator[](u__int idx) {
 }
 
 
+TritsetSupport::TritsetSupport(int arrIdx, int tritIdx, Tritset *p):
+        arrIndex(arrIdx),
+        tritIndexInByte(tritIdx),
+        ptr(p) {}
+
+
 u__int Tritset::capacity() {
     return arrSize * tritsInUnsignedInt;
 }
@@ -256,7 +262,7 @@ void Tritset::expandArray(u__int newSize) {
 }
 
 
-TritsetSupport &TritsetSupport::operator=(trit operand) {
+TritsetSupport& TritsetSupport::operator=(trit operand) {
     if (operand == trit::tUnknown && (arrIndex > ptr->arrSize || ptr->arrSize == 0)) {
         return *this;
     }
@@ -333,12 +339,6 @@ void Tritset::resetLastIndexInTrits() {
         }
     }
 }
-
-
-TritsetSupport::TritsetSupport(int arrIdx, int tritIdx, Tritset *p):
-    arrIndex(arrIdx),
-    tritIndexInByte(tritIdx),
-    ptr(p) {}
 
 
 bool TritsetSupport::operator==(const trit secondOperand) {
