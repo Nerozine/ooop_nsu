@@ -3,7 +3,7 @@
 
 void Validator::workflowCommandsNumberIsCorrect(std::vector<std::string> *commands, std::vector<int> *order) {
     if (commands->size() != order->size()) {
-        std::cerr << "the number of commands doesn't match the number of commands in the execution order" << endl;
+        std::cerr << "the number of commands doesn't match the number of commands in the execution order" << std::endl;
         exit(0);
     }
 }

@@ -73,9 +73,13 @@ Replace::Replace(std::string &oldW, std::string &newW) : oldWord(oldW), newWord(
 
 std::vector<std::string> *Replace::task(std::vector<std::string> *text) {
     using namespace std;
-    regex rx(oldWord);
+    regex rx_m("\\s" + oldWord + "\\s");
+    regex rx_s("^(" + oldWord + "\\s)");
+    regex rx_e("(\\s" + oldWord + ")$");
     for (int i = 0 ; i < text->size(); i++) {
-        (*text)[i] = regex_replace((*text)[i], rx, newWord);
+        (*text)[i] = regex_replace((*text)[i], rx_m, " " + newWord + " ");
+        (*text)[i] = regex_replace((*text)[i], rx_e, " " + newWord);
+        (*text)[i] = regex_replace((*text)[i], rx_s, newWord + " ");
     }
     return text;
 }
@@ -87,7 +91,7 @@ std::vector<std::string> *Dump::task(std::vector<std::string> *text) {
     using namespace std;
     try {
         if (!output.is_open()) {
-            throw invalid_argument("can't open output for grep");
+            throw invalid_argument("can't open output for dump");
         }
         for (int i = 0; i < text->size(); i++) {
             output << (*text)[i] << endl;
@@ -107,10 +111,21 @@ Grep::Grep(std::string &word) : word(word) {}
 std::vector<std::string> *Grep::task(std::vector<std::string> *text) {
     using namespace std;
     auto* newText = new vector<string>;
-    regex rx(word);
+    regex rx_m("\\s" + word + "\\s");
+    regex rx_s("^(" + word + "\\s)");
+    regex rx_e("(\\s" + word + ")$");
     for (int i = 0; i < text->size(); i++) {
-        if (regex_search((*text)[i], rx)) {
+        if (regex_search((*text)[i], rx_m)) {
             newText->emplace_back((*text)[i]);
+            continue;
+        }
+        if (regex_search((*text)[i], rx_s)) {
+            newText->emplace_back((*text)[i]);
+            continue;
+        }
+        if (regex_search((*text)[i], rx_e)) {
+            newText->emplace_back((*text)[i]);
+            continue;
         }
     }
     delete text;

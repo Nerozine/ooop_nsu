@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
                 throw invalid_argument("incorrect amount of parameters");
             }
             if (string(argv[2]) != "-i" && string(argv[2]) != "-o") {
-                throw invalid_argument("incorrect command line parametr on position 2: " + string(argv[2]));
+                throw invalid_argument("incorrect command line parameter on position 2: " + string(argv[2]));
             }
             else {
                 if (string(argv[2]) == "-i") {
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
             }
             if (argc > 4) {
                 if (string(argv[4]) != "-i" && string(argv[4]) != "-o") {
-                    throw invalid_argument("incorrect command line parametr on position 2: " + string(argv[2]));
+                    throw invalid_argument("incorrect command line parameter on position 2: " + string(argv[2]));
                 }
                 else {
                     if (string(argv[4]) == "-i") {
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     Validator::workflowNoRepeatsInOrder(order);
     Validator::checkCommandSyntax(text);
 
-    map<int, IWorker*>* blocks = Parser::parseBlocks(text, order);
+    map<int, IWorker*>* blocks = Parser::parseBlocks(text);
 
     Validator::checkConformityOrderCommands(blocks, order);
     Validator::checkInputOutput(blocks, order, commandLineI, commandLineO);
@@ -81,4 +81,4 @@ int main(int argc, char *argv[]) {
     delete blocks;
     workflow.close();
     return 0;
-};
+}
