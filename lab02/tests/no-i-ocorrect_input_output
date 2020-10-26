@@ -1,0 +1,5 @@
+desc
+5 = writefile out_no_csed.txt
+4 = readfile no_csed.txt
+csed
+4 -> 5

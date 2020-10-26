@@ -1,0 +1,4 @@
+desc
+3 = writefile input.txt
+csed
+3

@@ -1,0 +1,8 @@
+desc
+4 = replace a cadabraabra
+3 = grep a
+2 = sort
+5 = readfile 1input.txt
+1 = writefile 1output.txt
+csed
+5 -> 4 -> 3 -> 2 -> 1

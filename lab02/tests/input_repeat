@@ -1,0 +1,7 @@
+desc
+1 = replace abracadabra cadabraabra
+2 = grep z
+3 = sort
+4 = readfile no_csed.txt
+csed
+1 -> 2 -> 3
